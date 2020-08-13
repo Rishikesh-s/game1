@@ -1,0 +1,156 @@
+<!doctype html>
+<html>
+<head lang="en">
+<meta charset="utf-8">
+<title>
+new game
+
+</title>
+</head>
+<canvas id ="gameback" width= "800" height="600" style="border:1px solid blue; " >
+
+</canvas>
+<script>
+	var canvas = document.getElementById('gameback');;
+	var canvascon=canvas.getContext('2d');
+	var fps=30;
+	var ballx=50;
+	var ballspeedx=10;
+	var bally=50;
+	var ballspeedy=10;
+	var paddley=300;
+	var paddle2y=300;
+	const paddleheight= 100;
+	const paddlewidth= 10;
+	var p1=0,p2=0;
+	const WIN=3;
+	var showwin=false;
+	setInterval( function () {move();draw();},1500/fps );
+	canvas.addEventListener('mousemove',function (evt)
+	          {
+				var mousep=mouseposition(evt);
+				paddley=mousep.y-paddleheight/2;
+	          })
+	canvas.addEventListener('mousedown',mouseclick);
+	
+	function mouseclick(evt)
+	{
+		if (showwin)
+		{p1=0;
+		p2=0;
+		showwin=false;}
+	}
+	// movement of ball 
+	function move()
+	{   if (showwin)
+			{
+			return;}
+	        ballx +=ballspeedx;
+		if (ballx<0 )
+			{   if (bally>paddley &&bally<paddley+paddleheight)
+			             {ballspeedx=-ballspeedx;
+						 var diff=bally-(paddley+paddleheight/2);
+			              ballspeedy=diff*0.35;}
+			    else  { p2++;
+				ballreset();
+			          }
+			    
+			}
+	    if (ballx>canvas.width )
+			  {   
+					if (bally>paddle2y &&  bally<paddle2y+paddleheight)
+			             {ballspeedx=-ballspeedx;
+						 var diff=bally-(paddle2y+paddleheight/2);
+			              ballspeedy=diff*0.35;}
+			    else{p1++;
+				ballreset();
+				}
+			  
+			  }
+	    bally +=ballspeedy;
+	    if (bally>canvas.height )
+			    ballspeedy=-ballspeedy;
+	    if (bally<0 )
+			    ballspeedy=-ballspeedy;  
+	compmove();
+	}
+	
+	function drawnet()
+	{
+		for(let i=0;i<canvas.height;i+=40)
+		{    colorrect(canvas.width/2-1,i,2,20,'white');
+		}
+	}
+	//drawing all figures
+	function draw()
+	{	if (showwin)
+			{
+			canvascon.fillStyle='red';
+			if (p1>=WIN)
+				canvascon.fillText("P1 won",400,100);
+			else if(p2>=WIN)
+				canvascon.fillText("P2 won",400,100);
+			canvascon.fillText("RESTART",400,500);
+			return;
+			}
+	   colorrect(0,0,canvas.width,canvas.height,'black');
+	   colorrect(0,paddley,paddlewidth,paddleheight,'white');
+	   colorrect(canvas.width-paddlewidth,paddle2y,paddlewidth,paddleheight,'white');
+	   colorcir(ballx,bally,7,'white');
+	   canvascon.fillText(p1,50,100);
+	   canvascon.fillText(p2,canvas.width-50,100);
+	   drawnet();
+	}
+	
+	
+	//computer paddle 
+	function compmove()
+	{     var paddle2ycen=paddle2y+paddleheight/2;
+		if (paddle2ycen<bally-35)
+			{paddle2y+=6;}
+		else if(paddle2ycen>bally+35) {paddle2y-=6;}
+	}
+	
+	
+	//function to draw circle
+	function colorcir(x,y,radius,drawcolor)
+	{
+		canvascon.fillStyle=drawcolor;
+		canvascon.beginPath();
+		canvascon.arc(x,y,radius,0,Math.PI*2,true);
+		canvascon.fill();
+	}
+	
+	
+	//reset the ball when it goes out of bound
+	function ballreset()
+	{if ( p1>=WIN || p2>=WIN)
+		{
+			showwin=true;
+		}
+		ballspeedx=-ballspeedx;
+		bally=canvas.height/2;
+		ballx=canvas.width/2;
+	}
+	
+	
+	//draw rectangle
+	function colorrect(x,y,widht,height,reccolor)
+			{
+				canvascon.fillStyle=reccolor;
+				canvascon.fillRect(x,y,widht,height,);
+			}
+	
+	
+	//move the player paddle with mouse
+	function mouseposition(evt)
+	{
+		var rect=canvas.getBoundingClientRect();
+		var root=document.documentElement;
+		var mousex=evt.clientX-rect.left-root.scrollLeft;
+		var mousey=evt.clientY-rect.top-root.scrollTop;
+		return {x:mousex,y:mousey};
+	}
+	</script>
+	
+</html>
